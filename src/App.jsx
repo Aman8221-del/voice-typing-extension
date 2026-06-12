@@ -11,6 +11,10 @@ const App = () => {
   const recognitionRef = useRef(null);
   const transcriptRef = useRef("");
 
+  const [isOpen, setIsOpen] = useState(true);
+
+  if (!isOpen) return null;
+
   useEffect(() => {
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -57,16 +61,16 @@ const App = () => {
           (response) => {
             if (chrome.runtime.lastError) {
               setStatus(
-                "Couldn't reach this page. Reload the tab and try again."
+                "Couldn't reach this page. Reload the tab and try again.",
               );
             } else if (response?.inserted) {
               setStatus("Text inserted ✓");
             } else {
               setStatus(
-                "No field selected. Click a form field on the page first."
+                "No field selected. Click a form field on the page first.",
               );
             }
-          }
+          },
         );
       });
     };
@@ -90,27 +94,67 @@ const App = () => {
   };
 
   return (
-    <div style={{ padding: "20px", width: "350px" }}>
-      <h2>Voice Form Filler</h2>
-      <p style={{ fontSize: "12px", color: "#666" }}>
-        Click the form field on the page, then start recording. Text is
-        inserted when you stop.
+    <div
+      style={{
+        padding: "opx",
+        width: "240px",
+        position: "relative",
+        // border: "2px solid black",
+        borderRadius: "10px",
+        textAlign: "center",
+      }}
+    >
+      <h2 style={{ fontSize: "20px", padding: "0px" }}>Voice Form Filler</h2>
+      <p style={{ fontSize: "11px", fontWeight: "bold", color: "#666" }}>
+        Click the form field on the page, then start recording. Text is inserted
+        when you stop.
       </p>
-      <LanguageSelector language={language} onChange={setLanguage} />
+      <div style={{ display: "flex", justifyContent: "space-around" }}>
+        <LanguageSelector language={language} onChange={setLanguage} />
 
-      <button onClick={listening ? stopListening : startListening}>
-        {listening ? "Stop Recording" : "Start Recording"}
-      </button>
+        <button
+          style={{
+            height: "30px",
+            padding: "0 10px",
+            boxSizing: "border-box",
+            backgroundColor: listening ? "#dc3545" : "#43A047",
+            color: "white",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+            fontWeight: "bold",
+          }}
+          onClick={listening ? stopListening : startListening}
+        >
+          {listening ? "Stop Recording" : "Start Recording"}
+        </button>
+      </div>
       <StatusBar listening={listening} />
 
       <textarea
         value={transcript}
         readOnly
-        rows={8}
-        style={{ width: "100%" }}
+        rows={4}
+        style={{ width: "95%" }}
         placeholder="Your speech will appear here..."
       />
-      {status && <div style={{ fontSize: "12px" }}>{status}</div>}
+      {status && <div style={{ fontSize: "10px" }}>{status}</div>}
+      <button
+        onClick={() => setIsOpen(false)}
+        style={{
+          position: "absolute",
+          top: "5px",
+          right: "5px",
+          border: "none",
+          background: "gray",
+          fontSize: "16px",
+          cursor: "pointer",
+          borderRadius: "5px",
+          color: "white",
+        }}
+      >
+        ✕
+      </button>
     </div>
   );
 };
