@@ -2,14 +2,27 @@
   "manifest_version": 3,
   "name": "Voice Form Filler",
   "version": "1.0.0",
-  "description": "Fill form fields on any website using your voice.",
+
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "sidePanel"
+  ],
+
+  "host_permissions": ["<all_urls>"],
+
   "action": {
-    "default_popup": "index.html",
     "default_title": "Voice Form Filler"
   },
+
+  "side_panel": {
+    "default_path": "index.html"
+  },
+
   "background": {
     "service_worker": "background.js"
   },
+
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
@@ -18,6 +31,7 @@
       "all_frames": true
     }
   ],
+
   "web_accessible_resources": [
     {
       "resources": ["permission.html"],

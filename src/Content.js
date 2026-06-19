@@ -1,7 +1,7 @@
 // Tracks the field the user last focused so text can be inserted even after
 // the popup steals focus from the page.
 let lastFocusedField = null;
-
+console.log("CONTENT SCRIPT LOADED");
 const TEXT_INPUT_TYPES = new Set([
   "text",
   "search",
@@ -76,6 +76,7 @@ function insertText(text) {
 }
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  console.log("MESSAGE RECEIVED", message);
   if (message.action === "insertText") {
     const inserted = insertText(message.text);
     sendResponse({ inserted });
