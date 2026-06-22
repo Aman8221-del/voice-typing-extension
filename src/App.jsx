@@ -25,12 +25,18 @@ const App = () => {
     recognition.interimResults = true;
 
     recognition.onresult = (event) => {
-      let text = "";
-      for (let i = 0; i < event.results.length; i++) {
-        text += event.results[i][0].transcript;
-      }
-      transcriptRef.current = text;
+      const text = event.results[event.results.length - 1][0].transcript;
+
       setTranscript(text);
+
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (!tabs[0]?.id) return;
+
+        chrome.tabs.sendMessage(tabs[0].id, {
+          action: "liveTranscript",
+          text: text.trim(),
+        });
+      });
     };
 
     recognition.onerror = (event) => {
@@ -47,29 +53,6 @@ const App = () => {
     // silence — insert here so late-arriving final results are included.
     recognition.onend = () => {
       setListening(false);
-      const text = transcriptRef.current.trim();
-      if (!text) return;
-
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        if (!tabs[0]?.id) return;
-        chrome.tabs.sendMessage(
-          tabs[0].id,
-          { action: "insertText", text },
-          (response) => {
-            if (chrome.runtime.lastError) {
-              setStatus(
-                "Couldn't reach this page. Reload the tab and try again.",
-              );
-            } else if (response?.inserted) {
-              setStatus("Text inserted ✓");
-            } else {
-              setStatus(
-                "No field selected. Click a form field on the page first.",
-              );
-            }
-          },
-        );
-      });
     };
 
     recognitionRef.current = recognition;
@@ -91,24 +74,6 @@ const App = () => {
   };
 
   //////////////////////////////
-
-  function MicGlyph() {
-    return (
-      <svg
-        viewBox="0 0 24 24"
-        width="28"
-        height="28"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-      >
-        <path d="M12 15a3.5 3.5 0 0 0 3.5-3.5v-4a3.5 3.5 0 1 0-7 0v4A3.5 3.5 0 0 0 12 15Z" />
-        <path d="M18 11.5a6 6 0 0 1-12 0" />
-        <path d="M12 17v4" />
-        <path d="M9.5 21h5" />
-      </svg>
-    );
-  }
 
   function GearIcon() {
     return (

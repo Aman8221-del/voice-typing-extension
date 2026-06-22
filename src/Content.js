@@ -28,7 +28,7 @@ document.addEventListener(
   (e) => {
     if (isEditable(e.target)) lastFocusedField = e.target;
   },
-  true
+  true,
 );
 
 // Sets the value through the native setter so frameworks with controlled
@@ -59,11 +59,11 @@ function insertText(text) {
   // Insert at the cursor (or replace the selection) instead of always appending.
   const start = target.selectionStart ?? target.value.length;
   const end = target.selectionEnd ?? target.value.length;
-  const newValue = target.value.slice(0, start) + text + target.value.slice(end);
+  const newValue = text;
 
   setNativeValue(target, newValue);
 
-  const caret = start + text.length;
+  const caret = text.length;
   try {
     target.setSelectionRange(caret, caret);
   } catch {
@@ -77,8 +77,11 @@ function insertText(text) {
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   console.log("MESSAGE RECEIVED", message);
-  if (message.action === "insertText") {
+
+  if (message.action === "insertText" || message.action === "liveTranscript") {
     const inserted = insertText(message.text);
     sendResponse({ inserted });
   }
+
+  return true;
 });
